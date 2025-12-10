@@ -1,32 +1,238 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <link rel="stylesheet" href="styles.css" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>PakePlus App</title>
-        <script type="module" src="/main.js" defer></script>
-    </head>
-
-    <body>
-        <main class="container">
-            <h1>Welcome to PakePlus</h1>
-            <form class="row" id="greet-form">
-                <input id="inputValue" placeholder="Enter a something..." />
-            </form>
-            <div class="resultBox">
-                <span>result: </span>
-                <span id="result"></span>
-            </div>
-            <div class="invokeBox">
-                <button id="openUrl">open_url_browser</button>
-                <button id="openUrlNew">open_url_new</button>
-                <button id="runCommand">run_command</button>
-                <button id="downloadFile">download_file</button>
-                <button id="getExeDir">get_exe_dir</button>
-                <button id="getEnvVar">get_env_var</button>
-                <button id="findPort">find_port</button>
-            </div>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>试剂研发工作结构化日志</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>试剂研发工作结构化日志</h1>
+        </header>
+        
+        <!-- 撤销提示容器 -->
+        <div id="undoNotificationContainer" class="undo-notification-container"></div>
+        
+        <main>
+            <section class="form-section">
+                <h2>研发日志填写</h2>
+                
+                <div class="form-container">
+                    <form id="researchLogForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="date">日期 *</label>
+                                <input type="date" id="date" name="date" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="engineer">工程师/技术员 *</label>
+                                <input type="text" id="engineer" name="engineer" required placeholder="请输入姓名">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="employeeId">工号 *</label>
+                                <input type="text" id="employeeId" name="employeeId" placeholder="请输入工号">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="timePeriodDisplay">时间段 *</label>
+                                <div class="time-period-selector">
+                                    <div id="timePeriodDisplay" class="time-period-display">
+                                        <span id="selectedTimePeriodText">请选择时间段</span>
+                                        <input type="hidden" id="timePeriod" name="timePeriod" required>
+                                        <input type="hidden" id="startTime" name="startTime">
+                                        <input type="hidden" id="endTime" name="endTime">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="projectId">项目/任务编号</label>
+                                <input type="text" id="projectId" name="projectId" placeholder="请输入项目或任务编号">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="workTypeDisplay">工作类型 *</label>
+                                <div class="work-type-selector">
+                                    <div id="workTypeDisplay" class="work-type-display">
+                                        <span id="selectedWorkTypeText">请选择工作类型</span>
+                                        <input type="hidden" id="workType" name="workType" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="workHours">工时统计</label>
+                                <input type="number" id="workHours" name="workHours" readonly placeholder="自动计算">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="feedback">问题反馈（记录异常情况、出现的问题等）</label>
+                            <textarea id="feedback" name="feedback" rows="4" placeholder="请输入问题反馈"></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" id="saveBtn" class="btn btn-primary">保存数据</button>
+                            <button type="button" id="exportBtn" class="btn btn-success">导出Excel</button>
+                            <input type="file" id="importBtn" accept=".xlsx" style="display: none;">
+                            <button type="button" id="importBtnText" class="btn btn-info">导入Excel</button>
+                            <button type="reset" class="btn btn-danger">重置表单</button>
+                            <button type="button" id="manageWorkTypeBtn" class="btn btn-small btn-secondary">管理工作类型</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+            
+            <section class="data-section">
+                <h2>已保存数据</h2>
+                <div class="data-container">
+                    <table id="dataTable">
+                        <thead>
+                            <tr>
+                                <th>日期</th>
+                                <th>工程师/技术员</th>
+                                <th>工号</th>
+                                <th>时间段</th>
+                                <th>项目/任务编号</th>
+                                <th>工作类型</th>
+                                <th>问题反馈</th>
+                                <th>工时统计</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataTableBody">
+                            <!-- 数据将通过JavaScript动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </main>
-    </body>
+        
+        <footer>
+            <p>&copy; 试剂研发中心AI小组</p>
+        </footer>
+    </div>
+    
+    <script src="script.js"></script>
+    
+    <!-- 悬浮提醒 -->
+    <div id="floatingReminder" class="floating-reminder">
+        <div class="floating-reminder-content">
+            <h4>温馨提示</h4>
+            <ul>
+                <li>数据保存在本地浏览器缓存中，清除浏览器缓存会清空填写数据。建议每日点击【导出Excel】备份</li>
+                <li>点击【工作类型管理】新增自定义类型。</li>
+            </ul>
+            <button id="closeReminder" class="floating-reminder-close">×</button>
+        </div>
+    </div>
+    
+    <!-- 工作类型选择弹窗 -->
+    <div id="workTypeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>选择工作类型</h3>
+                <button type="button" class="close-btn" onclick="closeWorkTypeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="search-section">
+                    <input type="text" id="workTypeSearch" placeholder="搜索工作类型..." class="search-input">
+                </div>
+                <div id="workTypeList" class="work-type-list">
+                    <!-- 工作类型选项将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 工作类型管理弹窗 -->
+    <div id="workTypeManagerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>管理工作类型</h3>
+                <button type="button" class="close-btn" onclick="closeWorkTypeManager()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="manager-section">
+                    <h4>添加新工作类型</h4>
+                    <div class="add-work-type-form">
+                        <input type="text" id="newWorkType" placeholder="输入新工作类型名称">
+                        <button type="button" class="btn btn-primary" onclick="addWorkType()">添加</button>
+                    </div>
+                </div>
+                
+                <div class="manager-section">
+                    <h4>工作类型管理</h4>
+                    <div class="work-type-import-export">
+                        <button type="button" id="exportWorkTypesBtn" class="btn btn-small btn-success">导出工作类型</button>
+                        <input type="file" id="importWorkTypesBtn" accept=".json" style="display: none;">
+                        <button type="button" id="importWorkTypesBtnText" class="btn btn-small btn-info">导入工作类型</button>
+                    </div>
+                </div>
+                
+                <div class="manager-section">
+                    <h4>现有工作类型</h4>
+                    <div id="workTypeManagerList" class="work-type-manager-list">
+                        <!-- 工作类型管理列表将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeWorkTypeManager()">关闭</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 时间范围选择弹窗 -->
+    <div id="timeRangeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>选择时间段</h3>
+                <button type="button" class="close-btn" onclick="closeTimeRangeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="time-selection-section">
+                    <div class="time-input-group">
+                        <label for="startHour">开始时间</label>
+                        <div class="time-selector">
+                            <select id="startHour" class="time-select">
+                                <!-- 小时选项将通过JavaScript动态生成 -->
+                            </select>
+                            <span class="time-separator">:</span>
+                            <select id="startMinute" class="time-select">
+                                <!-- 分钟选项将通过JavaScript动态生成 -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="time-input-group">
+                        <label for="endHour">结束时间</label>
+                        <div class="time-selector">
+                            <select id="endHour" class="time-select">
+                                <!-- 小时选项将通过JavaScript动态生成 -->
+                            </select>
+                            <span class="time-separator">:</span>
+                            <select id="endMinute" class="time-select">
+                                <!-- 分钟选项将通过JavaScript动态生成 -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div id="timeRangeError" class="error-message"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeTimeRangeModal()">取消</button>
+                <button type="button" class="btn btn-primary" onclick="confirmTimeRange()">确认</button>
+            </div>
+        </div>
+    </div>
+</body>
 </html>
